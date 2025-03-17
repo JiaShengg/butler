@@ -16,6 +16,7 @@ import * as cognitoIdentityPool from "@aws-cdk/aws-cognito-identitypool-alpha";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as cloudfront_origins from "aws-cdk-lib/aws-cloudfront-origins";
+import * as fs from 'fs';
 
 interface UserInterfaceProps extends cdk.StackProps{
   multiAgentLambdaFunctionUrl:cdk.aws_lambda.FunctionUrl
@@ -93,7 +94,7 @@ export class UserInterfaceStack extends cdk.Stack {
 
     const userPool = new cognito.UserPool(this, "UserPool", {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      selfSignUpEnabled: false,
+      selfSignUpEnabled: true,
       autoVerify: { email: true, phone: true },
       signInAliases: {
         email: true,
@@ -208,6 +209,8 @@ export class UserInterfaceStack extends cdk.Stack {
           "sh",
           "-c",
           [
+            "mkdir -p /tmp/astro-home",
+            "export HOME=/tmp/astro-home",
             "npm --cache /tmp/.npm install",
             `npm --cache /tmp/.npm run build`,
             "cp -aur /asset-input/dist/* /asset-output/",
@@ -220,9 +223,11 @@ export class UserInterfaceStack extends cdk.Stack {
                 stdio: "inherit",
                 env: {
                   ...process.env,
+                  // Set HOME environment variable to a writable location
+                  HOME: process.env.HOME || '/tmp',
                 },
               };
-
+    
               execSync(`npm --silent --prefix "${appPath}" install`, options);
               execSync(`npm --silent --prefix "${appPath}" run build`, options);
               Utils.copyDirRecursive(buildPath, outputDir);
@@ -230,7 +235,7 @@ export class UserInterfaceStack extends cdk.Stack {
               console.error(e);
               return false;
             }
-
+    
             return true;
           },
         },

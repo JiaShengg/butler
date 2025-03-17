@@ -8,8 +8,7 @@ import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import * as path from "path";
 import { LexAgentConstruct } from './lex-agent-construct';
-import { BedrockKnowledgeBase } from './knowledge-base-construct';
-import {BedrockKnowledgeBaseModels } from './constants';
+
 
 
 export class ChatDemoStack extends cdk.Stack {
@@ -48,20 +47,10 @@ export class ChatDemoStack extends cdk.Stack {
     const assetsPyPath = path.join(__dirname, "../../../python/src/multi_agent_orchestrator/");
     const assetPyDoc = s3deploy.Source.asset(assetsPyPath);
 
-
-    const knowledgeBase = new BedrockKnowledgeBase(this, 'MutiAgentOrchestratorDocKb', {
-      kbName:'Multi-agent-orchestrator-doc-kb',
-      assetFiles:[],
-      embeddingModel: BedrockKnowledgeBaseModels.TITAN_EMBED_TEXT_V1,
-    });
-
     const maoFilesDeployment = new s3deploy.BucketDeployment(this, "DeployDocumentation", {
       sources: [assetDoc, assetTsDoc, assetPyDoc],
       destinationBucket: documentsBucket,
     });
-
-    knowledgeBase.addS3Permissions(documentsBucket.bucketName);
-    knowledgeBase.createAndSyncDataSource(documentsBucket.bucketArn);
 
     const powerToolsTypeScriptLayer = lambda.LayerVersion.fromLayerVersionArn(
       this,
@@ -100,6 +89,43 @@ export class ChatDemoStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(10),
     })
 
+    // const multiAgentLambdaFunction = new nodejs.NodejsFunction(
+    //   this,
+    //   "MultiAgentLambda",
+    //   {
+    //     entry: path.join(
+    //       __dirname,
+    //       "../lambda/multi-agent/index.ts"
+    //     ),
+    //     runtime: lambda.Runtime.NODEJS_20_X,
+    //     role: basicLambdaRole,
+    //     memorySize: 2048,
+    //     timeout: cdk.Duration.minutes(5),
+    //     layers: [powerToolsTypeScriptLayer],
+    //     environment: {
+    //       POWERTOOLS_SERVICE_NAME: "multi-agent",
+    //       POWERTOOLS_LOG_LEVEL: "DEBUG",
+    //       HISTORY_TABLE_NAME: sessionTable.tableName,
+    //       HISTORY_TABLE_TTL_KEY_NAME: 'TTL',
+    //       HISTORY_TABLE_TTL_DURATION: '3600',
+    //       LEX_AGENT_ENABLED: enableLexAgent.toString(),
+    //       LEX_AGENT_CONFIG: JSON.stringify(lexAgentConfig),
+    //       LAMBDA_AGENTS: JSON.stringify(
+    //         [{description:"This is an Agent to use when you forgot about your own name",name:'Find my name',functionName:pythonLambda.functionName, region:cdk.Aws.REGION}]),
+    //     },
+    //     bundling: {
+    //       minify: false,
+    //       externalModules: [
+    //         //"aws-lambda",
+    //         "@aws-lambda-powertools/logger",
+    //         "@aws-lambda-powertools/parameters",
+    //         //"@aws-sdk/client-ssm",
+    //     ],
+    //     },
+    //   }
+    // );
+
+
     const multiAgentLambdaFunction = new nodejs.NodejsFunction(
       this,
       "MultiAgentLambda",
@@ -114,6 +140,7 @@ export class ChatDemoStack extends cdk.Stack {
         timeout: cdk.Duration.minutes(5),
         layers: [powerToolsTypeScriptLayer],
         environment: {
+          KNOWLEDGE_BASE_ID: "DGIAITMXAG",
           POWERTOOLS_SERVICE_NAME: "multi-agent",
           POWERTOOLS_LOG_LEVEL: "DEBUG",
           HISTORY_TABLE_NAME: sessionTable.tableName,
@@ -121,28 +148,32 @@ export class ChatDemoStack extends cdk.Stack {
           HISTORY_TABLE_TTL_DURATION: '3600',
           LEX_AGENT_ENABLED: enableLexAgent.toString(),
           LEX_AGENT_CONFIG: JSON.stringify(lexAgentConfig),
-          KNOWLEDGE_BASE_ID: knowledgeBase.knowledgeBase.attrKnowledgeBaseId,
           LAMBDA_AGENTS: JSON.stringify(
-            [{description:"This is an Agent to use when you forgot about your own name",name:'Find my name',functionName:pythonLambda.functionName, region:cdk.Aws.REGION}]),
+            [{description:"This is an Agent to use when you forgot about your own name",name:'Find my name',functionName:pythonLambda.functionName, region:cdk.Aws.REGION}]
+          ),
         },
         bundling: {
           minify: false,
           externalModules: [
-            //"aws-lambda",
             "@aws-lambda-powertools/logger",
             "@aws-lambda-powertools/parameters",
-            //"@aws-sdk/client-ssm",
-        ],
+            "cohere-ai",
+            "chromadb",
+            "@aws-sdk/client-ssm",
+          ],
         },
       }
     );
 
     sessionTable.grantReadWriteData(multiAgentLambdaFunction);
     pythonLambda.grantInvoke(multiAgentLambdaFunction);
-
+  
+    multiAgentLambdaFunction.addEnvironment('KNOWLEDGE_BASE_ID', 'DGIAITMXAG');
+    
     multiAgentLambdaFunction.addToRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
+        sid: 'AmazonBedrockInvokeModelPermission',
         actions: [
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream",
@@ -156,19 +187,30 @@ export class ChatDemoStack extends cdk.Stack {
     multiAgentLambdaFunction.addToRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        sid: 'AmazonBedrockKbPermission',
+        sid: 'AmazonBedrockRetrievePermission',
         actions: [
           "bedrock:Retrieve",
           "bedrock:RetrieveAndGenerate"
         ],
         resources: [
-          `arn:aws:bedrock:${cdk.Aws.REGION}::foundation-model/*`,
-          `arn:${cdk.Aws.PARTITION}:bedrock:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:knowledge-base/${knowledgeBase.knowledgeBase.attrKnowledgeBaseId}`
+          `arn:aws:bedrock:${cdk.Aws.REGION}::foundation-model/*`
         ]
       })
     );
 
-
+    multiAgentLambdaFunction.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        sid: 'AmazonBedrockKnowledgeBasePermission',
+        actions: [
+          "bedrock:Retrieve",
+          "bedrock:RetrieveAndGenerate"
+        ],
+        resources: [
+          `arn:aws:bedrock:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:knowledge-base/${process.env.KNOWLEDGE_BASE_ID || "DGIAITMXAG"}`
+        ]
+      })
+    );
 
     const multiAgentLambdaFunctionUrl = multiAgentLambdaFunction.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.AWS_IAM,

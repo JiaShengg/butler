@@ -12,7 +12,7 @@ import { weatherToolDescription, weatherToolHanlder } from './weather_tool'
 import { mathToolHanlder, mathAgentToolDefinition } from './math_tool';
 import { APIGatewayProxyEventV2, Handler, Context } from "aws-lambda";
 import { Buffer } from "buffer";
-import { GREETING_AGENT_PROMPT, HEALTH_AGENT_PROMPT, MATH_AGENT_PROMPT, TECH_AGENT_PROMPT, WEATHER_AGENT_PROMPT } from "./prompts";
+import { GREETING_AGENT_PROMPT, MATH_AGENT_PROMPT, INCIDENT_REPORTING_AGENT_PROMPT, SELF_CHECKIN_AGENT_PROMPT, FACILITY_BOOKING_AGENT_PROMPT, VISITOR_MANAGEMENT_AGENT_PROMPT, SMART_IOT_CONTROL_AGENT_PROMPT, WEATHER_AGENT_PROMPT } from "./prompts";
 import { BedrockAgentRuntimeClient, SearchType } from '@aws-sdk/client-bedrock-agent-runtime';
 
 const logger = new Logger();
@@ -67,15 +67,6 @@ const orchestrator = new MultiAgentOrchestrator({
   }),
 });
 
-
-const healthAgent = new BedrockLLMAgent({
-  name: "Health Agent",
-  description:
-    "Focuses on health and medical topics such as general wellness, nutrition, diseases, treatments, mental health, fitness, healthcare systems, and medical terminology or concepts.",
-});
-
-healthAgent.setSystemPrompt(HEALTH_AGENT_PROMPT);
-
 const weatherAgent = new BedrockLLMAgent({
   name: "Weather Agent",
   description: "Specialized agent for giving weather condition from a city.",
@@ -109,70 +100,16 @@ const mathAgent = new BedrockLLMAgent({
 });
 mathAgent.setSystemPrompt(MATH_AGENT_PROMPT);
 
-
-
-if (LEX_AGENT_ENABLED === "true") {
-  const config: LexAgentConfig = JSON.parse(process.env.LEX_AGENT_CONFIG!);
-  orchestrator.addAgent(
-    new LexBotAgent({
-      name: config.name,
-      description: config.description,
-      botId: config.botId,
-      botAliasId: config.botAliasId,
-      localeId: config.localeId,
-    })
-  );
-}
-
-if (process.env.LAMBDA_AGENTS){
-  const lambdaAgents = JSON.parse(process.env.LAMBDA_AGENTS);
-  for (const agent of lambdaAgents) {
-    orchestrator.addAgent(new LambdaAgent({
-      name: agent.name,
-      description: agent.description,
-      functionName: agent.functionName,
-      functionRegion: agent.region
-    }
-    ));
-  }
-}
-
-// Add a our Multi-agent orchestrator documentation agent
-const maoDocAgent = new BedrockLLMAgent({
-  name: "Tech agent",
+const selfCheckInAgent = new BedrockLLMAgent({
+  name: "Self Check-in Agent",
   description:
-    "A tech expert specializing in the multi-agent orchestrator framework, technical domains, and AI-driven solutions.",
+    "Assists with onboarding (WiFi details, building info, check-in instructions, etc.).",
   streaming: true,
   inferenceConfig: {
     temperature: 0.0,
   },
   customSystemPrompt:{
-    template:`
-  You are a tech expert specializing in both the technical domain, including software development, AI, cloud computing, and the multi-agent orchestrator framework. Your role is to provide comprehensive, accurate, and helpful information about these areas, with a specific focus on the orchestrator framework, its agents, and their applications. Always structure your responses using clear, well-formatted markdown.
-
-        Key responsibilities:
-        - Explain the multi-agent orchestrator framework, its agents, and its benefits
-        - Guide users on how to get started with the framework and configure agents
-        - Provide technical advice on topics like software development, AI, and cloud computing
-        - Detail the process of creating and configuring an orchestrator
-        - Describe the various components and elements of the framework
-        - Provide examples and best practices for technical implementation
-
-        When responding to queries:
-        1. Start with a brief overview of the topic
-        2. Break down complex concepts into clear, digestible sections
-        3. **When the user asks for an example or code, always respond with a code snippet, using proper markdown syntax for code blocks (\`\`\`).** Provide explanations alongside the code when necessary.
-        4. Conclude with next steps or additional resources if relevant
-
-        Always use proper markdown syntax, including:
-        - Headings (##, ###) for main sections and subsections
-        - Bullet points (-) or numbered lists (1., 2., etc.) for enumerating items
-        - Code blocks (\`\`\`) for code snippets or configuration examples
-        - Bold (**text**) for emphasizing key terms or important points
-        - Italic (*text*) for subtle emphasis or introducing new terms
-        - Links ([text](URL)) when referring to external resources or documentation
-
-        Tailor your responses to both beginners and experienced developers, providing clear explanations and technical depth as appropriate.`
+    template:SELF_CHECKIN_AGENT_PROMPT
   },
   retriever: new AmazonKnowledgeBasesRetriever(
     new BedrockAgentRuntimeClient(),
@@ -180,17 +117,72 @@ const maoDocAgent = new BedrockLLMAgent({
       knowledgeBaseId: process.env.KNOWLEDGE_BASE_ID,
       retrievalConfiguration: {
         vectorSearchConfiguration: {
-          numberOfResults: 10,
-          overrideSearchType: SearchType.HYBRID,
+          numberOfResults: 1
         },
       },
     }
   )
   });
-orchestrator.addAgent(maoDocAgent);
 
-//orchestrator.addAgent(techAgent);
-orchestrator.addAgent(healthAgent);
+// const maoDocAgent = new BedrockLLMAgent({
+//   name: "Tech agent",
+//   description:
+//     "Free agent that answer anything related to onboarding process, i.e. password on wifi",
+//   streaming: true,
+//   inferenceConfig: {
+//     temperature: 0.0,
+//   },
+//   customSystemPrompt:{
+//     template:'Free agent that answer anything related to onboarding process, i.e. password on wifi'
+//   },
+//   retriever: new AmazonKnowledgeBasesRetriever(
+//     new BedrockAgentRuntimeClient(),
+//     {
+//       knowledgeBaseId: process.env.KNOWLEDGE_BASE_ID,
+//       retrievalConfiguration: {
+//         vectorSearchConfiguration: {
+//           numberOfResults: 1
+//           // overrideSearchType: SearchType.HYBRID,
+//         },
+//       },
+//     }
+//   )
+//   });
+// orchestrator.addAgent(maoDocAgent);
+
+const incidentReportingAgent = new BedrockLLMAgent({
+  name: "Incident Reporting Agent",
+  description: "Logs and tracks maintenance/security issues.",
+  streaming: false,
+});
+incidentReportingAgent.setSystemPrompt(INCIDENT_REPORTING_AGENT_PROMPT);
+
+const facilityBookingAgent = new BedrockLLMAgent({
+  name: "Facility Booking Agent",
+  description: "Manages reservations for shared spaces.",
+  streaming: false,
+});
+facilityBookingAgent.setSystemPrompt(FACILITY_BOOKING_AGENT_PROMPT);
+
+const visitorManagementAgent = new BedrockLLMAgent({
+  name: "Visitor Management Agent",
+  description: "Handles guest registration and access control.",
+  streaming: false,
+});
+visitorManagementAgent.setSystemPrompt(VISITOR_MANAGEMENT_AGENT_PROMPT);
+
+const smartIoTControlAgent = new BedrockLLMAgent({
+  name: "Smart IoT Control Agent",
+  description: "Manages smart devices and automates routines for convenience and energy savings.",
+  streaming: false,
+});
+smartIoTControlAgent.setSystemPrompt(SMART_IOT_CONTROL_AGENT_PROMPT);
+
+orchestrator.addAgent(selfCheckInAgent);
+orchestrator.addAgent(facilityBookingAgent);
+orchestrator.addAgent(visitorManagementAgent);
+orchestrator.addAgent(incidentReportingAgent);
+orchestrator.addAgent(smartIoTControlAgent);
 orchestrator.addAgent(weatherAgent);
 orchestrator.addAgent(mathAgent);
 
@@ -215,9 +207,7 @@ const agentList = Object.entries(agents)
 greetingAgent.setSystemPrompt(GREETING_AGENT_PROMPT(agentList));
 
 
-
 orchestrator.addAgent(greetingAgent);
-
 
 async function eventHandler(
   event: APIGatewayProxyEventV2,
@@ -229,7 +219,7 @@ async function eventHandler(
     const userBody = JSON.parse(event.body as string) as BodyData;
     const userId = userBody.userId;
     const sessionId = userBody.sessionId;
-
+    
     logger.info("calling the orchestrator");
     const response = await orchestrator.routeRequest(
       userBody.query,
@@ -317,3 +307,4 @@ async function eventHandler(
 }
 
 export const handler = awslambda.streamifyResponse(eventHandler);
+

@@ -6,6 +6,6 @@ client = boto3.client('bedrock-agent')
 def lambda_handler(event, context):
     response = client.start_ingestion_job(
         dataSourceId=event.get('dataSourceId'),
-        knowledgeBaseId=event.get('knowledgeBaseId')
+        knowledgeBaseId="VQSZYFGTVF"
     )
     print(response)
