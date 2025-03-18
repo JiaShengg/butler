@@ -1,0 +1,684 @@
+Repository Structure:
+
+[chat-demo-app]
+  - tsconfig.json
+  - repo_tree.txt
+  - repo_structure.txt
+  - debug.txt
+  - cdk.json
+  - package.json
+  - jest.config.js
+  - find_all_scripts.py
+  - package-lock.json
+  [img]
+    - chat-demo-app.png
+  [bin]
+    - chat-demo-app.ts
+  [scripts]
+    - download.js
+  [lib]
+    - chat-demo-app-stack.ts
+    - airlines.yaml
+    - lex-agent-construct.ts
+    - bedrock-agent-construct.ts
+    - constants.ts
+    - knowledge-base-construct.ts
+    - user-interface-stack.ts
+    [utils]
+      - utils.ts
+    [CustomResourcesLambda]
+      - permission-validation.ts
+      - data-source-sync.ts
+      - aoss-index-create.ts
+  [cdk.out]
+    - tree.json
+    - cdk.out
+    - UserInterfaceStack.template.json
+    - ChatDemoStack.assets.json
+    - ChatDemoStack.template.json
+    - manifest.json
+    - UserInterfaceStack.assets.json
+    - asset.3322b7049fb0ed2b7cbb644a2ada8d1116ff80c32dca89e6ada846b5de26f961.zip
+    [asset.068c4a0439ed76ea33c0e0188ac460e47853e826c9de7e099d5638b6216d7ca3]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.ChdjtkXB.css
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.D3hhbUmQ.js
+    [asset.1d5310e5ec2d09e1564d84671f3c20bc2fc5298d2a16e8ab63d03c561e036b6b]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.BVEtY3sZ.js
+        - index.D7IyN04q.css
+    [asset.1ee653b9cb53a1eacdc7d880d9f309537fd8c88cf2c3dd2b4cd1031e7594411c]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.ChdjtkXB.css
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.D3hhbUmQ.js
+    [asset.58e25da5585fb2ff5b16417c333c93fc4d38fb9f58f9ed7a4c08054a8a94c8ef]
+      - lambda.py
+    [asset.5fafc53334a794c61bc5b750f9b20658f5e3afba1881679cda09bd4f260365e5]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - ChatWindow.CXcChlD8.js
+        - index.KD8mcObN.css
+        - client.pxMMZNkZ.js
+    [asset.7d2be3f1c4e0895bf52932fe4c17f4990bb7444d7ca8fdc30501fc1a9cb43243]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.DzZPWgP8.js
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.DoMNsXEy.css
+    [asset.490160022b276636066f66611826d48b131253c507ba4a1a64e8223d5708e3c3]
+      - index.js
+    [nodejs]
+      - package.json
+      - package-lock.json
+    [asset.152a7e831838d69728e45a87fc579234d14c3e17a98ce52cc415477657078128]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CBBlbr_3.css
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - ChatWindow.CHBeUyhp.js
+        - client.pxMMZNkZ.js
+    [asset.f1490d5d5c56d597d2fe35e9c8a7c873d8950e8453573139949edbae186e56b9]
+    [asset.df2736e49025ad4850ce93e5ab08ce290c3c870326409de3d80018d5c442f259]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.BgfkdkUY.js
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.Cmt0K99F.css
+    [asset.bae445cf447cd0ee49454d55864214759ac75d8cf6b3039a51eac3c55f43be72]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.BVEtY3sZ.js
+        - index.D7IyN04q.css
+    [asset.8abe1852f3ad80ad22566f4d3290784670eb9b589bca25a0268466079d78e055]
+      - index.js
+    [asset.46ad6b372b2b92697dca85c903811313495fd91aad35ec80d118f8b97007efee]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - ChatWindow.BgpC5o6e.js
+        - index.Cabce_Pb.css
+        - client.pxMMZNkZ.js
+    [asset.e3e787e260347e2180db404738bac8a413508fe0b1e1c515852f62cd568826d4]
+      - index.js
+    [asset.6501115a0a0ccc0a07817f6d9c7df35e3a620eca9bcb5ef06ff3c2730a4f8ab9]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - index.k6DwJ0Ap.css
+        - ChatWindow.Cw9wv9Tn.js
+        - client.pxMMZNkZ.js
+    [asset.f8c1f977377afd1b365d6904277f17c65d6b914133cb8fe1bd45ba209b355f7e]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.BCYQYUrS.js
+        - index.D0f7QlNh.css
+    [asset.5992c72d6909737c2f5bdc17088d1972b7921e4ea722afc828ab902abd7d129a]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CBBlbr_3.css
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.BzBWohC0.js
+    [asset.a0ab8dd6c108309e7a8d3ba94ef5858c4ee5d36ec0638afd97d8b305e1352c9b]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - ChatWindow.Dci7z0sV.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.DoMNsXEy.css
+    [asset.192e4ed49a3e629e922b68f796f7cd599974d247b08a95fb8990e55c8c968de5]
+      - index.js
+    [asset.558cf511b4901afc0cd076b75dca142585a5b1c92d63761ccdc7ca68b0483b82]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - ChatWindow.BIGRKGoY.js
+        - client.pxMMZNkZ.js
+        - index.BkEl6mHN.css
+        - index.DbsoFcrC.css
+    [asset.1b02c6aaa85f901e9ac2b4a387eb8fb4ecc5ecf7b1bc84031ff6f71af73957b9]
+      - orchestrator.ts
+      - agentOverlapAnalyzer.ts
+      - index.ts
+      [agents]
+        - bedrockTranslatorAgent.ts
+        - supervisorAgent.ts
+        - bedrockInlineAgent.ts
+        - agent.ts
+        - anthropicAgent.ts
+        - openAIAgent.ts
+        - lambdaAgent.ts
+        - amazonBedrockAgent.ts
+        - lexBotAgent.ts
+        - chainAgent.ts
+        - comprehendFilterAgent.ts
+        - bedrockLLMAgent.ts
+        - bedrockFlowsAgent.ts
+      [classifiers]
+        - classifier.ts
+        - anthropicClassifier.ts
+        - openAIClassifier.ts
+        - bedrockClassifier.ts
+      [retrievers]
+        - AmazonKBRetriever.ts
+        - retriever.ts
+      [utils]
+        - tool.ts
+        - logger.ts
+        - chatUtils.ts
+        - helpers.ts
+      [types]
+        - index.ts
+      [storage]
+        - memoryChatStorage.ts
+        - sqlChatStorage.ts
+        - dynamoDbChatStorage.ts
+        - chatStorage.ts
+    [asset.b6ee6d00458900b3683a33fe08ce744dd4772e49b5c60e9fa16f711a43ef0cca]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.DkuSMQ4l.js
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - index.Bi9jwOTs.css
+        - client.pxMMZNkZ.js
+    [asset.6b2e978a456b0516db5e58d9c4fe208cb3b50e8e8169e157d64b6dd7e3367a90]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - ChatWindow.Dci7z0sV.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.DoMNsXEy.css
+    [asset.352b5d93be91a32d2ce89a5e36bd92d638a27e993ffba67c4fff29ec3f2e1d44]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.jgTwLWqK.js
+        - index.Bi0x2UM1.css
+    [asset.651245e6f2d64ca96d29626bdbb4ecaf485a5668763956f39572d7e47c42c91b-error]
+      [nodejs]
+        - package.json
+    [.cache]
+      - 0020cbb715d3c9a51e89e8b1dadef2577e906f060470930913470ae2cbc22284.zip
+      - 46ad6b372b2b92697dca85c903811313495fd91aad35ec80d118f8b97007efee.zip
+      - ad3dff486e5bc10928e63a32a022e13d7d4821e208e3c9cd03344e8f07e9e7ed.zip
+      - 5c364faacae8a324b73740fec6c7c951e6a4ba760a6023f4144bf7c90813f6e2.zip
+      - 4e7a64165815b34807fb737f8bfa44b2f3aa82b4c5c6ab2c473809dc94322942.zip
+      - 6501115a0a0ccc0a07817f6d9c7df35e3a620eca9bcb5ef06ff3c2730a4f8ab9.zip
+      - b6ee6d00458900b3683a33fe08ce744dd4772e49b5c60e9fa16f711a43ef0cca.zip
+      - 0158f40002a8c211635388a87874fd4dcc3d68f525fe08a0fe0f014069ae539c.zip
+      - 068c4a0439ed76ea33c0e0188ac460e47853e826c9de7e099d5638b6216d7ca3.zip
+      - 5fafc53334a794c61bc5b750f9b20658f5e3afba1881679cda09bd4f260365e5.zip
+      - 64275af4bdf735954b62d9de52dad7b587a09ed0d83b79509770ce09147192aa.zip
+      - b0c7925b49ff443392e5fd2aba889e08d95ee251241b85203c55fcbebb785a9b.zip
+      - e3ebdd647daab7cddca2698969a2d5024da1af4d64f9612a1bdb6407236b6210.zip
+      - f1490d5d5c56d597d2fe35e9c8a7c873d8950e8453573139949edbae186e56b9.zip
+      - 8abe1852f3ad80ad22566f4d3290784670eb9b589bca25a0268466079d78e055.zip
+      - 59a5a799dcd504cdd816da71f1aa4dac22e06cd0acd396b239a896e3d19515ad.zip
+      - ab1467d19a2a5fc0c1d40f42d528e426c97136f804916fa5bb6aef7bb2f0c574.zip
+      - 86d5415c6bd59e412a5ad27b36278f2207087aa438143c1311c67d9b124480f4.zip
+      - f88b3d9263bfd0ee0d8b829c6d68071ff62b8cd7055fb96812d650601c6964e8.zip
+      - 759c1779c3b00ba1cbefdc08d4b037c7f609d7849f6e1bb8b518a41bf3a773d0.zip
+      - de0fe2cfb336dcf1a77af3f1842fe71d017da84013d3c7add26dbdfc36b34522.zip
+      - a0ab8dd6c108309e7a8d3ba94ef5858c4ee5d36ec0638afd97d8b305e1352c9b.zip
+      - 558cf511b4901afc0cd076b75dca142585a5b1c92d63761ccdc7ca68b0483b82.zip
+      - f802c740b530f289403b7c05f168ffe197afc79c68edab2b9e614eca7a66fcb4.zip
+      - 490160022b276636066f66611826d48b131253c507ba4a1a64e8223d5708e3c3.zip
+      - d7969ace858c08ca7dbdca8c1b20d01ebbf0a340845224c6f1470dcb19a23923.zip
+      - 0859e99b5c8cdf492e5c9c5d2d850969a9048995d021db2d173d653827012154.zip
+      - 28ab00a713e2b80afe426bec56f6d468f93ae183bb36b2576c7025ef99488f9d.zip
+      - 4aa89e2433066ff07ec48dbe06ea2583da865ad6a6601d148719f6cbc80488c9.zip
+      - 8756b072428bacdb06d362d4132bc3fba48727619e0262f91433a1f325d971b2.zip
+      - 6b2e978a456b0516db5e58d9c4fe208cb3b50e8e8169e157d64b6dd7e3367a90.zip
+      - 1d5310e5ec2d09e1564d84671f3c20bc2fc5298d2a16e8ab63d03c561e036b6b.zip
+      - f98bf0b22fde7baccc94fc5a5488e6a6107564d581c186b4a92ed7e2c6cae194.zip
+      - 8d96f4e1e8257aaa520f76aa2627d927184ca6154d0c3047ccbb88e353587fd9.zip
+      - 1becb8c8ef4348ed1999bc661128421068e99b27397f6248eb097c3c8a8043c8.zip
+      - b82f388e92a1cfa0af83a56bae87bed986bc923353de741cb7f3d23ed37ae8f1.zip
+      - 1a3f93a3842626bc33eed874297db00eebe28b2cea628201ed57c7907bb5c98a.zip
+      - bae445cf447cd0ee49454d55864214759ac75d8cf6b3039a51eac3c55f43be72.zip
+      - 7d2be3f1c4e0895bf52932fe4c17f4990bb7444d7ca8fdc30501fc1a9cb43243.zip
+      - e3e787e260347e2180db404738bac8a413508fe0b1e1c515852f62cd568826d4.zip
+      - 8e7489c32e83ff01af0c817ea8b24cc16a8ec4c452a3a74d8f771ee15ad1e3e3.zip
+      - f8c1f977377afd1b365d6904277f17c65d6b914133cb8fe1bd45ba209b355f7e.zip
+      - df2736e49025ad4850ce93e5ab08ce290c3c870326409de3d80018d5c442f259.zip
+      - 152a7e831838d69728e45a87fc579234d14c3e17a98ce52cc415477657078128.zip
+      - 3c80ffa770e0c4813c98f900a1ca30e14785914b122fc535f37dca30f2663d92.zip
+      - fb568a1037a0f7d67d4cc29dcf61f8363877e6d0ee5a47dea137ec9786e6fd88.zip
+      - d87515be475c91bf617651931860d355375c72005fc49aafdcd1275fb404e183.zip
+      - e61cf6b5c1f8f4ae1b334ab4e60df07ee420681e548c6bbcc6d4d8f84279fcef.zip
+      - 6369ae828d30394b04197dcd4ac0f9d50c9b823b241e9ebe9e86adc6dbf199ce.zip
+      - faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip
+      - c84c5e410936102852acadb28ec115227054fabb1e042f9b3e718b37f5996e71.zip
+      - 32bb18575b0af1f601faa92884e5aa469f62834f43c295102ae95f07cec93cf1.zip
+      - 58e25da5585fb2ff5b16417c333c93fc4d38fb9f58f9ed7a4c08054a8a94c8ef.zip
+      - 22995cadb4345c8842df0b75a32d6929f19e88f080f7729580bd1fee12694908.zip
+      - f0e8834e7ffa182eb6aec5780183a575b1e2d406ea69bd5f8909a3eb7fb46e82.zip
+      - 192e4ed49a3e629e922b68f796f7cd599974d247b08a95fb8990e55c8c968de5.zip
+      - b4115e2b9666749cc66d64a55f891da077133db37b71550c5d57db15b2a667e4.zip
+      - 352b5d93be91a32d2ce89a5e36bd92d638a27e993ffba67c4fff29ec3f2e1d44.zip
+      - 1b02c6aaa85f901e9ac2b4a387eb8fb4ecc5ecf7b1bc84031ff6f71af73957b9.zip
+      - 26a401a8cc5d37012e7187a4e29b33e177400c405f9886fcd48cb8aaf0ee09ef.zip
+    [asset.74d68da28dfe9ecdbe884d5333a781d7155e5f3f7fc0fbb00ed18a07c784079f-error]
+    [asset.c84c5e410936102852acadb28ec115227054fabb1e042f9b3e718b37f5996e71]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.DzZPWgP8.js
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.DoMNsXEy.css
+    [asset.e3ebdd647daab7cddca2698969a2d5024da1af4d64f9612a1bdb6407236b6210]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.ChdjtkXB.css
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.D3hhbUmQ.js
+    [asset.f802c740b530f289403b7c05f168ffe197afc79c68edab2b9e614eca7a66fcb4]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.DzZPWgP8.js
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.DoMNsXEy.css
+    [asset.28ab00a713e2b80afe426bec56f6d468f93ae183bb36b2576c7025ef99488f9d]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.DzZPWgP8.js
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.DoMNsXEy.css
+    [asset.581f7c140b0a25ed8b0406dd3be40f53203747847208ca241b3f62b8f42e10a5-error]
+    [asset.f0e8834e7ffa182eb6aec5780183a575b1e2d406ea69bd5f8909a3eb7fb46e82]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.KU7AMmC7.js
+        - index.CEThVCg_.js
+        - client.pxMMZNkZ.js
+        - index.BsROjUSB.css
+        - index.BkEl6mHN.css
+    [bundling-temp-1fe46051d9d2edae54e41702554d43ddad4f83174ab809126a618f83c9c92c7b-error]
+    [asset.4aa89e2433066ff07ec48dbe06ea2583da865ad6a6601d148719f6cbc80488c9]
+      - __init__.py
+      - orchestrator.py
+      [agents]
+        - lambda_agent.py
+        - __init__.py
+        - openai_agent.py
+        - agent.py
+        - anthropic_agent.py
+        - chain_agent.py
+        - lex_bot_agent.py
+        - comprehend_filter_agent.py
+        - bedrock_llm_agent.py
+        - bedrock_flows_agent.py
+        - supervisor_agent.py
+        - bedrock_translator_agent.py
+        - amazon_bedrock_agent.py
+        - bedrock_inline_agent.py
+      [classifiers]
+        - classifier.py
+        - __init__.py
+        - anthropic_classifier.py
+        - bedrock_classifier.py
+        - openai_classifier.py
+      [retrievers]
+        - amazon_kb_retriever.py
+        - __init__.py
+        - retriever.py
+      [utils]
+        - logger.py
+        - __init__.py
+        - tool.py
+        - helpers.py
+      [types]
+        - __init__.py
+        - types.py
+      [storage]
+        - __init__.py
+        - in_memory_chat_storage.py
+        - dynamodb_chat_storage.py
+        - sql_chat_storage.py
+        - chat_storage.py
+    [asset.ad3dff486e5bc10928e63a32a022e13d7d4821e208e3c9cd03344e8f07e9e7ed]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.KU7AMmC7.js
+        - index.CEThVCg_.js
+        - client.pxMMZNkZ.js
+        - index.BsROjUSB.css
+        - index.BkEl6mHN.css
+    [asset.1096eba6334b4df5f455bca3ac19871f94e65bf4c9050cfcbc1d5dd523e6192f]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.DzZPWgP8.js
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.DoMNsXEy.css
+    [asset.b82f388e92a1cfa0af83a56bae87bed986bc923353de741cb7f3d23ed37ae8f1]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - index.DMugo8bf.css
+        - ChatWindow.7JpcTxi0.js
+        - client.pxMMZNkZ.js
+    [asset.d7969ace858c08ca7dbdca8c1b20d01ebbf0a340845224c6f1470dcb19a23923]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.CjjGBC2h.css
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.C1xptNu9.js
+    [asset.b4115e2b9666749cc66d64a55f891da077133db37b71550c5d57db15b2a667e4]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - ChatWindow.DfHaTkDc.js
+        - client.pxMMZNkZ.js
+        - index.BkEl6mHN.css
+        - index.DbsoFcrC.css
+    [asset.759c1779c3b00ba1cbefdc08d4b037c7f609d7849f6e1bb8b518a41bf3a773d0]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.CjjGBC2h.css
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.C1xptNu9.js
+    [asset.32bb18575b0af1f601faa92884e5aa469f62834f43c295102ae95f07cec93cf1]
+      - index.js
+    [asset.6b73ce59523ae3da825a7414d99bd77444a12245d9dcd7ee05238ede2d44c011-error]
+    [asset.fb568a1037a0f7d67d4cc29dcf61f8363877e6d0ee5a47dea137ec9786e6fd88]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.DhYZZe0J.js
+        - index.BsROjUSB.css
+        - ChatWindow.D5WjBOru.js
+        - client.BIGLHmRd.js
+        - index.BkEl6mHN.css
+    [asset.3c80ffa770e0c4813c98f900a1ca30e14785914b122fc535f37dca30f2663d92]
+      - index.js
+    [asset.4e7a64165815b34807fb737f8bfa44b2f3aa82b4c5c6ab2c473809dc94322942]
+      - index.js
+    [asset.273712cd817c48cd5cbe0bfdf8ecdfbc5836a3a642df282a11deac8dc9cdac74-error]
+      [nodejs]
+        - package.json
+    [asset.d87515be475c91bf617651931860d355375c72005fc49aafdcd1275fb404e183]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.C_IzsXhW.css
+        - index.DhYZZe0J.js
+        - ChatWindow.BmV7NUsE.js
+        - client.BIGLHmRd.js
+    [asset.5c364faacae8a324b73740fec6c7c951e6a4ba760a6023f4144bf7c90813f6e2]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.1LO-BMKT.js
+        - index.DhYZZe0J.js
+        - client.BIGLHmRd.js
+        - index.CVddn80z.css
+    [asset.59a5a799dcd504cdd816da71f1aa4dac22e06cd0acd396b239a896e3d19515ad]
+      - index.js
+    [asset.26a401a8cc5d37012e7187a4e29b33e177400c405f9886fcd48cb8aaf0ee09ef]
+      [nodejs]
+        - package.json
+        - package-lock.json
+    [asset.0020cbb715d3c9a51e89e8b1dadef2577e906f060470930913470ae2cbc22284]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - ChatWindow.DzZPWgP8.js
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.DoMNsXEy.css
+    [asset.b0c7925b49ff443392e5fd2aba889e08d95ee251241b85203c55fcbebb785a9b]
+      - index.js
+    [asset.1a3f93a3842626bc33eed874297db00eebe28b2cea628201ed57c7907bb5c98a]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CBBlbr_3.css
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.BzBWohC0.js
+    [asset.0859e99b5c8cdf492e5c9c5d2d850969a9048995d021db2d173d653827012154]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - ChatWindow.fV4PzkNe.js
+        - index.pgSbAMzq.css
+    [asset.64275af4bdf735954b62d9de52dad7b587a09ed0d83b79509770ce09147192aa]
+      - index.mdx
+      [agents]
+        - custom-agents.mdx
+        - overview.mdx
+        - tools.mdx
+        [built-in]
+          - anthropic-agent.mdx
+          - bedrock-translator-agent.mdx
+          - bedrock-llm-agent.mdx
+          - supervisor-agent.mdx
+          - bedrock-inline-agent.mdx
+          - lex-bot-agent.mdx
+          - lambda-agent.mdx
+          - comprehend-filter-agent.mdx
+          - chain-agent.mdx
+          - bedrock-flows-agent.mdx
+          - openai-agent.mdx
+          - amazon-bedrock-agent.mdx
+      [classifiers]
+        - custom-classifier.mdx
+        - overview.mdx
+        [built-in]
+          - bedrock-classifier.mdx
+          - openai-classifier.mdx
+          - anthropic-classifier.mdx
+      [cookbook]
+        [examples]
+          - fast-api-streaming.md
+          - ollama-classifier.mdx
+          - ecommerce-support-simulator.md
+          - chat-demo-app.md
+          - ollama-agent.mdx
+          - api-agent.mdx
+          - python-local-demo.md
+          - typescript-local-demo.md
+          - chat-chainlit-app.md
+        [lambda]
+          - aws-lambda-nodejs.md
+          - aws-lambda-python.md
+        [monitoring]
+          - agent-overlap.md
+          - logging.mdx
+        [tools]
+          - weather-api.mdx
+          - math-operations.md
+        [patterns]
+          - cost-efficient.md
+          - multi-lingual.md
+      [retrievers]
+        - overview.md
+        - custom-retriever.mdx
+        [built-in]
+          - bedrock-kb-retriever.mdx
+      [general]
+        - how-it-works.md
+        - faq.md
+        - quickstart.mdx
+        - introduction.md
+      [orchestrator]
+        - overview.mdx
+      [storage]
+        - dynamodb.mdx
+        - in-memory.mdx
+        - overview.md
+        - sql.mdx
+        - custom.mdx
+    [asset.1becb8c8ef4348ed1999bc661128421068e99b27397f6248eb097c3c8a8043c8]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.C_IzsXhW.css
+        - index.DhYZZe0J.js
+        - ChatWindow.BS7SKt16.js
+        - client.BIGLHmRd.js
+    [asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6]
+      - index.js
+    [asset.4f9edf5766b5ebab5b6b9de2ec58915da084dfa930072f41a8aee4066ece621c-error]
+    [asset.ab1467d19a2a5fc0c1d40f42d528e426c97136f804916fa5bb6aef7bb2f0c574]
+      - index.js
+    [asset.de0fe2cfb336dcf1a77af3f1842fe71d017da84013d3c7add26dbdfc36b34522]
+      - index.js
+    [asset.8e7489c32e83ff01af0c817ea8b24cc16a8ec4c452a3a74d8f771ee15ad1e3e3]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - ChatWindow.DfDUmLYH.js
+        - index.DidF7TE0.css
+        - client.pxMMZNkZ.js
+        - index.D0f7QlNh.css
+    [asset.e61cf6b5c1f8f4ae1b334ab4e60df07ee420681e548c6bbcc6d4d8f84279fcef]
+      - index.js
+    [asset.e6224f4ce5b22e1e5aca74f9e24d66f4054ba53f0d036b9d2a2295ec0b53b8ba-error]
+      [nodejs]
+    [asset.bd7a2d4c63d8eaecd150aa90edce3e203bba15bb2f9e4ca2e53d1f8e1f664907-error]
+    [asset.f88b3d9263bfd0ee0d8b829c6d68071ff62b8cd7055fb96812d650601c6964e8]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - ChatWindow.6KtRF__3.js
+        - client.pxMMZNkZ.js
+        - index.CMvMyjxf.css
+    [asset.6369ae828d30394b04197dcd4ac0f9d50c9b823b241e9ebe9e86adc6dbf199ce]
+      - index.mjs
+      - package.json
+      - package-lock.json
+    [asset.22995cadb4345c8842df0b75a32d6929f19e88f080f7729580bd1fee12694908]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.C_IzsXhW.css
+        - index.DhYZZe0J.js
+        - ChatWindow.BS7SKt16.js
+        - client.BIGLHmRd.js
+    [asset.f98bf0b22fde7baccc94fc5a5488e6a6107564d581c186b4a92ed7e2c6cae194]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.CEThVCg_.js
+        - index.DidF7TE0.css
+        - ChatWindow.BgpC5o6e.js
+        - index.Cabce_Pb.css
+        - client.pxMMZNkZ.js
+    [asset.eb92fabbd4ccc723adb674fd154adc9630dfbf7177f3a6df9f03cdedb9cccb7d-error]
+    [asset.8d96f4e1e8257aaa520f76aa2627d927184ca6154d0c3047ccbb88e353587fd9]
+      - index.html
+      - favicon.svg
+      [_astro]
+        - index.C_IzsXhW.css
+        - index.DhYZZe0J.js
+        - ChatWindow.BS7SKt16.js
+        - client.BIGLHmRd.js
+    [asset.86d5415c6bd59e412a5ad27b36278f2207087aa438143c1311c67d9b124480f4]
+      - index.js
+    [asset.838df1e4dda82d8087b6dd35b46c17dafb73f38439e9f7fc13a78ad748d31073-error]
+      [nodejs]
+        - package.json
+    [asset.0158f40002a8c211635388a87874fd4dcc3d68f525fe08a0fe0f014069ae539c]
+      - index.py
+    [asset.8756b072428bacdb06d362d4132bc3fba48727619e0262f91433a1f325d971b2]
+      - aws-exports.json
+  [lambda]
+    [find-my-name]
+      - lambda.py
+    [multi-agent]
+      - prompts.ts
+      - weather_tool.ts
+      - math_tool.ts
+      - index.ts
+    [sync_bedrock_knowledgebase]
+      - lambda.py
+    [auth]
+      - index.mjs
+      - package.json
+      - package-lock.json
+  [test]
+    - chat-demo-app.ts

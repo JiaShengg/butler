@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Code2, BookOpen, RefreshCw } from 'lucide-react';
+import { Send, RefreshCw, InfoIcon, ArrowRight } from 'lucide-react';
 import { ChatApiClient } from '../utils/ApiClient';
 import { v4 as uuidv4 } from 'uuid';
 import { Authenticator } from '@aws-amplify/ui-react';
@@ -14,13 +14,13 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import LoadingScreen from '../components/loadingScreen';
 
+// More professional, subtle loading messages
 const waitMessages = [
-  "Hang tight! Great things take time!",
-  "Almost there... Grabbing the answers!",
-  "Good things come to those who wait!",
-  "Patience is a virtue, right?",
-  "We’re brewing up something special!",
-  "Just a second! AI is thinking hard!",
+  "Processing your request...",
+  "Retrieving information...",
+  "Analyzing your query...",
+  "Preparing response...",
+  "Generating insights...",
 ];
 
 const getRandomWaitMessage = () => {
@@ -40,34 +40,33 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({ content }) => {
         code({ node, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '');
           return match ? (
-            <pre className="bg-slate-100 rounded-md p-4 my-2 overflow-x-auto text-sm font-mono text-slate-900">
+            <pre className="bg-gray-50 rounded-md p-4 my-2 overflow-x-auto text-sm font-mono text-gray-800 border border-gray-200">
               <code className={className} {...props}>
                 {children}
               </code>
             </pre>
           ) : (
-            <code className="bg-slate-200 text-slate-900 px-1 rounded font-mono" {...props}>
+            <code className="bg-gray-100 text-gray-800 px-1 rounded font-mono" {...props}>
               {children}
             </code>
           );
         },
-        p: ({ node, ...props }) => <p className="mb-2 text-slate-900" {...props} />,
-        a: ({ node, ...props }) => <a className="text-blue-700 hover:underline font-semibold" target="_blank" rel="noopener noreferrer" {...props} />,
-        h1: ({ node, ...props }) => <h1 className="text-2xl font-bold mt-4 mb-2 text-slate-900" {...props} />,
-        h2: ({ node, ...props }) => <h2 className="text-xl font-bold mt-3 mb-2 text-slate-900" {...props} />,
-        h3: ({ node, ...props }) => <h3 className="text-lg font-bold mt-2 mb-1 text-slate-900" {...props} />,
-        ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-2 pl-4 text-slate-900" {...props} />,
-        ol: ({ node, ...props }) => <ol className="list-decimal mb-2 pl-6 text-slate-900" {...props} />,
-        li: ({ node, ...props }) => <li className="mb-1 text-slate-900" {...props} />,
-        blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-blue-700 pl-4 italic my-2 text-slate-700" {...props} />,
+        p: ({ node, ...props }) => <p className="mb-2 text-gray-800" {...props} />,
+        a: ({ node, ...props }) => <a className="text-indigo-600 hover:text-indigo-800 font-medium" {...props} />,
+        h1: ({ node, ...props }) => <h1 className="text-2xl font-semibold mt-4 mb-2 text-gray-900" {...props} />,
+        h2: ({ node, ...props }) => <h2 className="text-xl font-semibold mt-3 mb-2 text-gray-900" {...props} />,
+        h3: ({ node, ...props }) => <h3 className="text-lg font-semibold mt-2 mb-1 text-gray-900" {...props} />,
+        ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-2 pl-4 text-gray-800" {...props} />,
+        ol: ({ node, ...props }) => <ol className="list-decimal mb-2 pl-6 text-gray-800" {...props} />,
+        li: ({ node, ...props }) => <li className="mb-1 text-gray-800" {...props} />,
+        blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-indigo-300 pl-4 my-2 text-gray-700" {...props} />,
       }}
-      className="markdown-content text-slate-900"
+      className="markdown-content text-gray-800"
     >
       {content}
     </ReactMarkdown>
   );
 };
-
 
 const ChatWindow: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -116,18 +115,13 @@ const ChatWindow: React.FC = () => {
   };
 
   useEffect(() => {
-   initializeClient();
+    initializeClient();
   }, []);
 
-
-  
-  
   const renderMessageContent = (content: string) => {
     const processedContent = replaceTextEmotesWithEmojis(content);
     return <MarkdownRenderer content={processedContent} />;
   };
-
-  
 
   useEffect(() => {
     let session_id = localStorage.getItem('sessionId');
@@ -166,7 +160,7 @@ const ChatWindow: React.FC = () => {
         setMessages(prevMessages => [
           ...prevMessages,
           {
-            content: "Failed to initialize the chat client. Please try again or refresh the page.",
+            content: "Connection error. Please refresh the page and try again.",
             sender: 'System',
             timestamp: new Date().toISOString(),
             isWaiting: false
@@ -211,7 +205,6 @@ const ChatWindow: React.FC = () => {
           if (done) break;
 
           const chunk = decoder.decode(value);
-          //console.log("chunk="+chunk)
           const lines = chunk.split('\n');
 
           for (const line of lines) {
@@ -247,7 +240,6 @@ const ChatWindow: React.FC = () => {
         }
       }
 
-
     } catch (error) {
       console.error('Error in API call:', error);
       setMessages(prevMessages => [
@@ -262,7 +254,13 @@ const ChatWindow: React.FC = () => {
     } finally {
       setResponseReceived(true);
       setRunning(false);
+    }
+  };
 
+  const handleOnboardingClick = () => {
+    setInputMessage("onboarding details");
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
   };
 
@@ -276,156 +274,148 @@ const ChatWindow: React.FC = () => {
   };
 
   if (isAuthenticated === null) {
-    return <LoadingScreen text="Please wait..." />;
+    return <LoadingScreen text="Initializing..." />;
   }
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       <Authenticator>
         {({ signOut: _signOut, user: _user }) => (
-          <div className="flex flex-col h-[90vh] w-[70vw] bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
-            <div className="text-center mb-6 relative">
-              <h1 className="text-3xl font-bold text-blue-700 mb-2">
-                Multi-Agent Orchestrator Demo
-              </h1>
+          <div className="flex flex-col max-w-screen-lg w-full h-[90vh] bg-white rounded-lg p-6 shadow-md">
+            <div className="mb-6 relative">
+              <h1 className="text-2xl font-semibold text-gray-900">UrbanIQ</h1>
+              <p className="text-sm text-gray-600 mb-3">
+                Smart Property Management Platform
+              </p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-2">
+                <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs text-gray-700">
+                  <span className="font-medium block">Self-Check-In</span>
+                  WiFi details & access instructions
+                </div>
+                <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs text-gray-700">
+                  <span className="font-medium block">Facility Booking</span>
+                  Reserve shared spaces
+                </div>
+                <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs text-gray-700">
+                  <span className="font-medium block">Visitor Management</span>
+                  Guest registration & access
+                </div>
+                <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs text-gray-700">
+                  <span className="font-medium block">Smart Controls</span>
+                  IoT devices & automation
+                </div>
+                <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs text-gray-700">
+                  <span className="font-medium block">Incident Reporting</span>
+                  Maintenance & security issues
+                </div>
+                <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs text-gray-700">
+                  <span className="font-medium block">Weather Updates</span>
+                  Real-time forecasts
+                </div>
+              </div>
+              
               <button
                 onClick={resetSessionId}
-                className="absolute top-0 right-0 bg-slate-200 hover:bg-slate-300 text-slate-900 px-3 py-2 rounded-lg flex items-center text-sm transition-colors duration-200"
+                className="absolute top-0 right-0 bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-full transition-colors duration-200"
+                title="New conversation"
               >
-                <RefreshCw size={24} />
+                <RefreshCw size={18} />
               </button>
-              <p className="text-lg text-slate-900 mb-4">
-                Experience the power of intelligent routing and context management
-                across multiple AI agents.
-              </p>
-              <p className="text-md text-slate-700 italic">
-                Type "hello" or "bonjour" to see the available agents, or ask questions like "How do I use agents?", "How can I use the framework to create a custom agent?", "What are the steps to customize an agent?"
-              </p>
             </div>
 
-            <div className="flex-grow bg-slate-50 rounded-lg p-4 overflow-y-auto mb-4">
-              {messages.map((msg, index) => (
-                <div key={index} className="mb-4">
-                  <div className={`rounded-lg py-2 px-4 ${
-                    msg.sender === "You" 
-                      ? "bg-blue-100 text-slate-900 ml-auto border border-blue-200" 
-                      : "bg-white border border-slate-200 text-slate-900"
-                  }`}>
-                    <p className={`text-xs font-semibold mb-1 ${
-                      msg.sender === "You" 
-                        ? "text-blue-700"
-                        : "text-slate-700"
-                    }`}>
-                      {msg.sender}
-                    </p>
-                    {msg.isWaiting ? (
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="animate-spin">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-8 w-8 text-blue-700"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M5 12a7 7 0 0 1 14 0M12 5a7 7 0 0 1 0 14" />
-                          </svg>
-                        </div>
-                        <p className="mt-2 text-slate-600 text-sm">
-                          {getRandomWaitMessage()}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="markdown-wrapper">{renderMessageContent(msg.content)}</div>
-                    )}
-                    <p className="text-xs mt-1 text-slate-500">
-                      {new Date(msg.timestamp).toLocaleTimeString()}
-                    </p>
-                  </div>
+            {/* Static Onboarding Card */}
+            <div className="mb-4 bg-indigo-50 border border-indigo-100 rounded-lg p-4 shadow-sm">
+              <div className="flex items-start">
+                <div className="mr-3 text-indigo-600 mt-1">
+                  <InfoIcon size={20} />
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
+                <div className="flex-1">
+                  <h3 className="font-medium text-indigo-800 mb-1">New to UrbanIQ?</h3>
+                  <p className="text-sm text-indigo-700 mb-2">
+                    Get started with our platform features, access instructions, and property information.
+                  </p>
+                  <button 
+                    onClick={handleOnboardingClick}
+                    className="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                  >
+                    Click for onboarding details
+                    <ArrowRight size={14} className="ml-1" />
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex mt-auto mb-4">
+            <div className="flex-grow rounded-lg border border-gray-200 overflow-y-auto mb-4 shadow-inner bg-gray-50">
+              <div className="p-4">
+                {messages.map((msg, index) => (
+                  <div key={index} className={`flex mb-4 ${msg.sender === "You" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-3/4 rounded-lg py-2 px-4 shadow-sm ${
+                      msg.sender === "You"
+                        ? "bg-indigo-50 text-gray-800 border-l-4 border-indigo-400"
+                        : "bg-white text-gray-800 border-l-4 border-gray-300"
+                    }`}>
+                      <div className={`text-xs font-medium mb-1 ${
+                        msg.sender === "You"
+                          ? "text-indigo-600"
+                          : "text-gray-600"
+                      }`}>
+                        {msg.sender || "UrbanIQ Assistant"}
+                      </div>
+                      {msg.isWaiting ? (
+                        <div className="flex items-center space-x-2 py-2">
+                          <div className="relative w-4 h-4">
+                            <div className="absolute top-0 h-4 w-4 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            {getRandomWaitMessage()}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="markdown-wrapper">{renderMessageContent(msg.content)}</div>
+                      )}
+                      <p className="text-xs mt-1 text-gray-400">
+                        {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex mt-auto">
               <input
                 ref={inputRef}
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                className="flex-grow mr-2 p-2 rounded-lg bg-white border-2 border-slate-200 text-slate-900 placeholder-slate-500 focus:border-blue-700 focus:ring-2 focus:ring-blue-200"
-                placeholder="Type a message..."
+                className="flex-grow mr-2 p-3 rounded-md bg-white border border-gray-300 text-gray-800 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200 shadow-sm"
+                placeholder="Type your message..."
                 disabled={running}
               />
               <button
                 type="submit"
-                className="bg-blue-700 hover:bg-blue-800 text-white p-2 rounded-lg transition-colors duration-200"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-md transition-colors duration-200 shadow-sm disabled:bg-indigo-300"
                 disabled={running}
               >
-                <Send size={20} />
+                <Send size={18} />
               </button>
             </form>
 
-            <div className="text-center text-slate-900">
-  <p className="mb-2">To learn more about the Multi-Agent Orchestrator:</p>
-  <div className="flex justify-center space-x-4">
-    <a
-      href="https://github.com/awslabs/multi-agent-orchestrator"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold py-2 px-4 rounded-lg transition-all duration-300"
-    >
-      <Code2 size={24} className="mr-2 text-blue-700" />
-      GitHub Repo
-    </a>
-    <a
-      href="https://awslabs.github.io/multi-agent-orchestrator/"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold py-2 px-4 rounded-lg transition-all duration-300"
-    >
-      <BookOpen size={24} className="mr-2 text-blue-700" />
-      Documentation
-    </a>
-    <a
-      href="https://github.com/awslabs/multi-agent-orchestrator/tree/main/examples/chat-demo-app"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold py-2 px-4 rounded-lg transition-all duration-300"
-    >
-      <svg 
-        viewBox="0 0 24 24" 
-        className="w-6 h-6 mr-2 text-blue-700"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-        <polyline points="7.5 4.21 12 6.81 16.5 4.21" />
-        <polyline points="7.5 19.79 7.5 14.6 3 12" />
-        <polyline points="21 12 16.5 14.6 16.5 19.79" />
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-        <line x1="12" y1="22.08" x2="12" y2="12" />
-      </svg>
-      Deploy this app!
-    </a>
-  </div>
-</div>
-
-            <button
-              onClick={handleSignOut}
-              className="mt-4 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg transition-colors duration-200"
-            >
-              Sign out
-            </button>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleSignOut}
+                className="text-sm px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md transition-colors duration-200"
+              >
+                Sign out
+              </button>
+            </div>
           </div>
         )}
       </Authenticator>
     </div>
   );
 };
+
 export default ChatWindow;

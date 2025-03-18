@@ -27,7 +27,7 @@ action_groups_list = [
 
 knowledge_bases = [
     {
-        "knowledgeBaseId": "knowledge-base-id-01",
+        "knowledgeBaseId": "VQSZYFGTVF",
         "description": 'This is my knowledge base for documents 01',
     },
     {

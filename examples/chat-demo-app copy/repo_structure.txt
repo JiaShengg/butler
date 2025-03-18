@@ -307,7 +307,6 @@
               timeout: cdk.Duration.minutes(5),
               layers: [powerToolsTypeScriptLayer],
               environment: {
-                KNOWLEDGE_BASE_ID: "DGIAITMXAG",
                 POWERTOOLS_SERVICE_NAME: "multi-agent",
                 POWERTOOLS_LOG_LEVEL: "DEBUG",
                 HISTORY_TABLE_NAME: sessionTable.tableName,
@@ -335,12 +334,9 @@
           sessionTable.grantReadWriteData(multiAgentLambdaFunction);
           pythonLambda.grantInvoke(multiAgentLambdaFunction);
       
-          multiAgentLambdaFunction.addEnvironment('KNOWLEDGE_BASE_ID', 'DGIAITMXAG');
-      
           multiAgentLambdaFunction.addToRolePolicy(
             new iam.PolicyStatement({
               effect: iam.Effect.ALLOW,
-              sid: 'AmazonBedrockInvokeModelPermission',
               actions: [
                 "bedrock:InvokeModel",
                 "bedrock:InvokeModelWithResponseStream",
@@ -354,7 +350,7 @@
           multiAgentLambdaFunction.addToRolePolicy(
             new iam.PolicyStatement({
               effect: iam.Effect.ALLOW,
-              sid: 'AmazonBedrockRetrievePermission',
+              sid: 'AmazonBedrockKbPermission',
               actions: [
                 "bedrock:Retrieve",
                 "bedrock:RetrieveAndGenerate"
@@ -365,19 +361,7 @@
             })
           );
       
-          multiAgentLambdaFunction.addToRolePolicy(
-            new iam.PolicyStatement({
-              effect: iam.Effect.ALLOW,
-              sid: 'AmazonBedrockKnowledgeBasePermission',
-              actions: [
-                "bedrock:Retrieve",
-                "bedrock:RetrieveAndGenerate"
-              ],
-              resources: [
-                `arn:aws:bedrock:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:knowledge-base/${process.env.KNOWLEDGE_BASE_ID || "DGIAITMXAG"}`
-              ]
-            })
-          );
+      
       
           const multiAgentLambdaFunctionUrl = multiAgentLambdaFunction.addFunctionUrl({
             authType: lambda.FunctionUrlAuthType.AWS_IAM,
@@ -1032,7 +1016,6 @@
       import * as cognito from "aws-cdk-lib/aws-cognito";
       import * as lambda from "aws-cdk-lib/aws-lambda";
       import * as cloudfront_origins from "aws-cdk-lib/aws-cloudfront-origins";
-      import * as fs from 'fs';
       
       interface UserInterfaceProps extends cdk.StackProps{
         multiAgentLambdaFunctionUrl:cdk.aws_lambda.FunctionUrl
@@ -1225,8 +1208,6 @@
                 "sh",
                 "-c",
                 [
-                  "mkdir -p /tmp/astro-home",
-                  "export HOME=/tmp/astro-home",
                   "npm --cache /tmp/.npm install",
                   `npm --cache /tmp/.npm run build`,
                   "cp -aur /asset-input/dist/* /asset-output/",
@@ -1239,8 +1220,6 @@
                       stdio: "inherit",
                       env: {
                         ...process.env,
-                        // Set HOME environment variable to a writable location
-                        HOME: process.env.HOME || '/tmp',
                       },
                     };
       
@@ -1303,48 +1282,6 @@
       }
       [Code End]
     [utils]
-      - utils.d.ts
-        [Code Start]
-        /// <reference types="node" />
-        /// <reference types="node" />
-        export declare abstract class Utils {
-            static copyDirRecursive(sourceDir: string, targetDir: string): void;
-        }
-        /**
-         * Interface to store the combination of filenames and their contents.
-         * @key: filename
-         * @value: contents of the file
-         *
-         * Usage:
-         * const fileBuffers: FileBufferMap = {
-         * 'file1.txt': Buffer.from('This is file 1'),
-         * 'file2.jpg': Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]), // Binary data for a JPG file
-         * 'file3.pdf': Buffer.from('...'), // Binary data for a PDF file
-        };
-         */
-        export interface FileBufferMap {
-            [filename: string]: Buffer;
-        }
-        export declare function generateFileBufferMap(files: Buffer[]): FileBufferMap;
-        /**
-        * Writes a set of files to a specified directory. This is used for creating a
-        * temp directory for the contents of the assets that need to be uploaded to S3
-        *
-        * @param dirPath - The path of the directory where the files will be written.
-        * @param files - A map of file names to file buffers, representing the files to be written.
-        */
-        export declare function writeFilesToDir(dirPath: string, files: FileBufferMap): void;
-        /**
-        * Collection and property names follow regex: ^[a-z][a-z0-9-]{2,31}$. We will
-        * use the first 32-suffixLength characters of the Kb to generate the name.
-        *
-        * @param resourceName Name of the kb/collection. This will be trimmed to fit suffix.
-        * @param suffix Suffix to append to the kbName.
-        * @returns string that conforms to AOSS validations (timmedName-prefix)
-        */
-        export declare function generateNamesForAOSS(resourceName: string, suffix: string): string;
-        [Code End]
-      - utils.js
       - utils.ts
         [Code Start]
         import * as fs from "node:fs";
@@ -1555,7 +1492,6 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         [Code End]
-      - data-source-sync.js
       - data-source-sync.ts
         [Code Start]
         import { BedrockAgentClient, StartIngestionJobCommand, DeleteDataSourceCommand, DeleteKnowledgeBaseCommand, GetDataSourceCommand } from "@aws-sdk/client-bedrock-agent";
@@ -1684,24 +1620,6 @@
             }
         };
         [Code End]
-      - data-source-sync.d.ts
-        [Code Start]
-        import { OnEventRequest, OnEventResponse } from 'aws-cdk-lib/custom-resources/lib/provider-framework/types';
-        /**
-         * OnEvent is called to create/update/delete the custom resource. We are only using it
-         * here to start a one-off ingestion job at deployment.
-         *
-         * https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/crpg-ref-requests.html
-         *
-         * @param event request object containing event type and request variables. This contains 2
-         * params: knowledgeBaseId(Required), dataSourceId(Required)
-         * @param _context Lambda context, currently unused.
-         *
-         * @returns reponse object containing the physical resource ID of the ingestionJob.
-         */
-        export declare const onEvent: (event: OnEventRequest, _context: unknown) => Promise<OnEventResponse>;
-        [Code End]
-      - aoss-index-create.js
       - aoss-index-create.ts
         [Code Start]
         import { defaultProvider } from '@aws-sdk/credential-provider-node';
@@ -1852,43 +1770,6 @@
             return await createIndex(openSearchClient, indexName, indexConfig);
         };
         [Code End]
-      - permission-validation.js
-      - permission-validation.d.ts
-        [Code Start]
-        import { OnEventRequest, OnEventResponse } from 'aws-cdk-lib/custom-resources/lib/provider-framework/types';
-        /**
-         * Handles the 'Create', 'Update', and 'Delete' events for a custom resource.
-         *
-         * This function checks the existence of an OpenSearch index and retries the operation if the index is not found,
-         * with a configurable retry strategy.
-         *
-         * @param event - The request object containing the event type and request variables.
-         *   - indexName (required): The name of the OpenSearch index to check.
-         *   - collectionEndpoint (required): The endpoint of the OpenSearch collection.
-         * @param _context - The Lambda context object. Unused currently.
-         *
-         * @returns - A response object containing the physical resource ID of the index name.
-         *   - For 'Create' or 'Update' events, the physical resource ID is 'osindex_<indexName>'.
-         *   - For 'Delete' events, the physical resource ID is 'skip'.
-         */
-        export declare const onEvent: (event: OnEventRequest, _context: unknown) => Promise<OnEventResponse>;
-        [Code End]
-      - aoss-index-create.d.ts
-        [Code Start]
-        import { OnEventRequest, OnEventResponse } from 'aws-cdk-lib/custom-resources/lib/provider-framework/types';
-        /**
-         * OnEvent is called to create/update/delete the custom resource.
-         *
-         * https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/crpg-ref-requests.html
-         *
-         * @param event request object containing event type and request variables. This contains 3
-         * params: indexName(Required), collectionEndpoint(Required), indexConfiguration(Optional)
-         * @param _context Lambda context
-         *
-         * @returns reponse object containing the physical resource ID of the indexName.
-         */
-        export declare const onEvent: (event: OnEventRequest, _context: unknown) => Promise<OnEventResponse>;
-        [Code End]
   [cdk.out]
     - tree.json
     - cdk.out
@@ -1907,7 +1788,6 @@
         - index.DidF7TE0.css
         - client.pxMMZNkZ.js
         - ChatWindow.D3hhbUmQ.js
-    [asset.29461a7fa505aacbafef3b8436dc3e7e67fdfaab1a09f0f3530faeee9d1b180a-error]
     [asset.1d5310e5ec2d09e1564d84671f3c20bc2fc5298d2a16e8ab63d03c561e036b6b]
       - index.html
       - favicon.svg
@@ -1989,8 +1869,6 @@
         - index.D7IyN04q.css
     [asset.8abe1852f3ad80ad22566f4d3290784670eb9b589bca25a0268466079d78e055]
       - index.js
-    [asset.01958a7ea9740a5d818782b1a9bcd544bbed5aef9f6794509b0914ff8ce65d99]
-      - index.js
     [asset.46ad6b372b2b92697dca85c903811313495fd91aad35ec80d118f8b97007efee]
       - index.html
       - favicon.svg
@@ -2020,7 +1898,6 @@
         - client.pxMMZNkZ.js
         - ChatWindow.BCYQYUrS.js
         - index.D0f7QlNh.css
-    [asset.78f9e06d0d0368797ae5e5e48fefefb90097c295ed6195646f31fd81a3ab8e42-error]
     [asset.5992c72d6909737c2f5bdc17088d1972b7921e4ea722afc828ab902abd7d129a]
       - index.html
       - favicon.svg
@@ -2041,8 +1918,6 @@
         - index.DoMNsXEy.css
     [asset.192e4ed49a3e629e922b68f796f7cd599974d247b08a95fb8990e55c8c968de5]
       - index.js
-    [asset.cb384031c0cbb3b54ab2a9825bfcb79b424d93f60216dbdda9774d1ec8387cec]
-      - index.js
     [asset.558cf511b4901afc0cd076b75dca142585a5b1c92d63761ccdc7ca68b0483b82]
       - index.html
       - favicon.svg
@@ -2052,8 +1927,6 @@
         - client.pxMMZNkZ.js
         - index.BkEl6mHN.css
         - index.DbsoFcrC.css
-    [asset.96e7a52c294b29238d057bfddb0941ce9404964c26d2e617b90c93237d727460]
-      - index.js
     [asset.1b02c6aaa85f901e9ac2b4a387eb8fb4ecc5ecf7b1bc84031ff6f71af73957b9]
       - orchestrator.ts
         [Code Start]
@@ -7811,13 +7684,9 @@
     [asset.651245e6f2d64ca96d29626bdbb4ecaf485a5668763956f39572d7e47c42c91b-error]
       [nodejs]
     [.cache]
-      - 0294339878377436bee9a59b8e2264711f91b120dfa9dbc8d8e544014abd7847.zip
       - 0020cbb715d3c9a51e89e8b1dadef2577e906f060470930913470ae2cbc22284.zip
       - 46ad6b372b2b92697dca85c903811313495fd91aad35ec80d118f8b97007efee.zip
-      - 4be977cb2dce375ad897c940e959c7dbd2cac11ff55c9b56465090a413b6c65d.zip
-      - 96e7a52c294b29238d057bfddb0941ce9404964c26d2e617b90c93237d727460.zip
       - ad3dff486e5bc10928e63a32a022e13d7d4821e208e3c9cd03344e8f07e9e7ed.zip
-      - 59c68845ac2d1e3701bce12ca1ce8d16676b2878ff9fd5253c2d0f3eeddd3613.zip
       - 5c364faacae8a324b73740fec6c7c951e6a4ba760a6023f4144bf7c90813f6e2.zip
       - 4e7a64165815b34807fb737f8bfa44b2f3aa82b4c5c6ab2c473809dc94322942.zip
       - 6501115a0a0ccc0a07817f6d9c7df35e3a620eca9bcb5ef06ff3c2730a4f8ab9.zip
@@ -7826,13 +7695,10 @@
       - 068c4a0439ed76ea33c0e0188ac460e47853e826c9de7e099d5638b6216d7ca3.zip
       - 5fafc53334a794c61bc5b750f9b20658f5e3afba1881679cda09bd4f260365e5.zip
       - 64275af4bdf735954b62d9de52dad7b587a09ed0d83b79509770ce09147192aa.zip
-      - a1a98d165f95f830d4e55ad502827275df0deaf10060c8cc90c6f8691810975f.zip
       - b0c7925b49ff443392e5fd2aba889e08d95ee251241b85203c55fcbebb785a9b.zip
-      - b32735bf638a7065ccede6857c3adbad475c9081e62bd13dff41afa3a0ff9372.zip
       - e3ebdd647daab7cddca2698969a2d5024da1af4d64f9612a1bdb6407236b6210.zip
       - f1490d5d5c56d597d2fe35e9c8a7c873d8950e8453573139949edbae186e56b9.zip
       - 8abe1852f3ad80ad22566f4d3290784670eb9b589bca25a0268466079d78e055.zip
-      - e0a4a2f2bd056d28226c2247836d73a6129f3a61b07dfb9401be8ad2ce9314a2.zip
       - 59a5a799dcd504cdd816da71f1aa4dac22e06cd0acd396b239a896e3d19515ad.zip
       - ab1467d19a2a5fc0c1d40f42d528e426c97136f804916fa5bb6aef7bb2f0c574.zip
       - 86d5415c6bd59e412a5ad27b36278f2207087aa438143c1311c67d9b124480f4.zip
@@ -7844,9 +7710,7 @@
       - f802c740b530f289403b7c05f168ffe197afc79c68edab2b9e614eca7a66fcb4.zip
       - 490160022b276636066f66611826d48b131253c507ba4a1a64e8223d5708e3c3.zip
       - d7969ace858c08ca7dbdca8c1b20d01ebbf0a340845224c6f1470dcb19a23923.zip
-      - 723bf274385581b6abe36cc80c3dd00a2d49c3998ba6284289327aecc651e634.zip
       - 0859e99b5c8cdf492e5c9c5d2d850969a9048995d021db2d173d653827012154.zip
-      - 34468b8c802a4e7b7f66f1bfedcb9409f51aa60d7587199469f2f8adc70038e8.zip
       - 28ab00a713e2b80afe426bec56f6d468f93ae183bb36b2576c7025ef99488f9d.zip
       - 4aa89e2433066ff07ec48dbe06ea2583da865ad6a6601d148719f6cbc80488c9.zip
       - 8756b072428bacdb06d362d4132bc3fba48727619e0262f91433a1f325d971b2.zip
@@ -7857,16 +7721,13 @@
       - 1becb8c8ef4348ed1999bc661128421068e99b27397f6248eb097c3c8a8043c8.zip
       - b82f388e92a1cfa0af83a56bae87bed986bc923353de741cb7f3d23ed37ae8f1.zip
       - 1a3f93a3842626bc33eed874297db00eebe28b2cea628201ed57c7907bb5c98a.zip
-      - ab2a690d44309391779640ef7bf68b26d85a75542edd16d2f20d2cccbc9e2899.zip
       - bae445cf447cd0ee49454d55864214759ac75d8cf6b3039a51eac3c55f43be72.zip
       - 7d2be3f1c4e0895bf52932fe4c17f4990bb7444d7ca8fdc30501fc1a9cb43243.zip
       - e3e787e260347e2180db404738bac8a413508fe0b1e1c515852f62cd568826d4.zip
-      - cb384031c0cbb3b54ab2a9825bfcb79b424d93f60216dbdda9774d1ec8387cec.zip
       - 8e7489c32e83ff01af0c817ea8b24cc16a8ec4c452a3a74d8f771ee15ad1e3e3.zip
       - f8c1f977377afd1b365d6904277f17c65d6b914133cb8fe1bd45ba209b355f7e.zip
       - df2736e49025ad4850ce93e5ab08ce290c3c870326409de3d80018d5c442f259.zip
       - 152a7e831838d69728e45a87fc579234d14c3e17a98ce52cc415477657078128.zip
-      - 01958a7ea9740a5d818782b1a9bcd544bbed5aef9f6794509b0914ff8ce65d99.zip
       - 3c80ffa770e0c4813c98f900a1ca30e14785914b122fc535f37dca30f2663d92.zip
       - fb568a1037a0f7d67d4cc29dcf61f8363877e6d0ee5a47dea137ec9786e6fd88.zip
       - d87515be475c91bf617651931860d355375c72005fc49aafdcd1275fb404e183.zip
@@ -7875,9 +7736,6 @@
       - faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip
       - c84c5e410936102852acadb28ec115227054fabb1e042f9b3e718b37f5996e71.zip
       - 32bb18575b0af1f601faa92884e5aa469f62834f43c295102ae95f07cec93cf1.zip
-      - bee7f62da600fae2f669a11957afec62bb504bc82202a7bbfecf0c524aa68429.zip
-      - 045e0e1175babe990c064e6eb902165873bd226e84ae56341c56befe400451ca.zip
-      - 94c5df2817f8369e8a5e9bde0cc9720204d2baee5d9013e3e2688b960411e1df.zip
       - 58e25da5585fb2ff5b16417c333c93fc4d38fb9f58f9ed7a4c08054a8a94c8ef.zip
       - 22995cadb4345c8842df0b75a32d6929f19e88f080f7729580bd1fee12694908.zip
       - f0e8834e7ffa182eb6aec5780183a575b1e2d406ea69bd5f8909a3eb7fb46e82.zip
@@ -7896,9 +7754,6 @@
         - index.DidF7TE0.css
         - client.pxMMZNkZ.js
         - index.DoMNsXEy.css
-    [asset.b4d3f17beb7c5d1bb8d92f3067a1fb15d515a553922f1cde218037ff9e721004-error]
-    [asset.a1a98d165f95f830d4e55ad502827275df0deaf10060c8cc90c6f8691810975f]
-      - index.js
     [asset.e3ebdd647daab7cddca2698969a2d5024da1af4d64f9612a1bdb6407236b6210]
       - index.html
       - favicon.svg
@@ -7936,11 +7791,7 @@
         - client.pxMMZNkZ.js
         - index.BsROjUSB.css
         - index.BkEl6mHN.css
-    [asset.59c68845ac2d1e3701bce12ca1ce8d16676b2878ff9fd5253c2d0f3eeddd3613]
-      - index.js
     [bundling-temp-1fe46051d9d2edae54e41702554d43ddad4f83174ab809126a618f83c9c92c7b-error]
-    [asset.0294339878377436bee9a59b8e2264711f91b120dfa9dbc8d8e544014abd7847]
-      - index.js
     [asset.4aa89e2433066ff07ec48dbe06ea2583da865ad6a6601d148719f6cbc80488c9]
       - __init__.py
         [Code Start]
@@ -12665,15 +12516,6 @@
                       list[ConversationMessage]: All chat messages for the user and session.
                   """
           [Code End]
-    [asset.0bdd68138a5a66bb1e8aeb1e74540870c2edfaf4d259cae4867ff25f4eef445c]
-      - index.html
-      - favicon.svg
-      [_astro]
-        - ChatWindow.DzZPWgP8.js
-        - index.CEThVCg_.js
-        - index.DidF7TE0.css
-        - client.pxMMZNkZ.js
-        - index.DoMNsXEy.css
     [asset.ad3dff486e5bc10928e63a32a022e13d7d4821e208e3c9cd03344e8f07e9e7ed]
       - index.html
       - favicon.svg
@@ -12719,11 +12561,6 @@
         - client.pxMMZNkZ.js
         - index.BkEl6mHN.css
         - index.DbsoFcrC.css
-    [asset.5e06ea372d59d24b3cab5b74d1eed34b6792ae186176f12d3968c2f2d0524f5d]
-      - index.js
-    [asset.563d5d5e8a77378e7efa3545fcdfa9eda7ca390365b6c89083752df15e33c3de-error]
-    [asset.723bf274385581b6abe36cc80c3dd00a2d49c3998ba6284289327aecc651e634]
-      - index.js
     [asset.759c1779c3b00ba1cbefdc08d4b037c7f609d7849f6e1bb8b518a41bf3a773d0]
       - index.html
       - favicon.svg
@@ -12733,8 +12570,6 @@
         - index.DidF7TE0.css
         - client.pxMMZNkZ.js
         - ChatWindow.C1xptNu9.js
-    [asset.34468b8c802a4e7b7f66f1bfedcb9409f51aa60d7587199469f2f8adc70038e8]
-      - index.js
     [asset.32bb18575b0af1f601faa92884e5aa469f62834f43c295102ae95f07cec93cf1]
       - index.js
     [asset.6b73ce59523ae3da825a7414d99bd77444a12245d9dcd7ee05238ede2d44c011-error]
@@ -12771,8 +12606,6 @@
         - index.CVddn80z.css
     [asset.59a5a799dcd504cdd816da71f1aa4dac22e06cd0acd396b239a896e3d19515ad]
       - index.js
-    [asset.4be977cb2dce375ad897c940e959c7dbd2cac11ff55c9b56465090a413b6c65d]
-      - index.js
     [asset.26a401a8cc5d37012e7187a4e29b33e177400c405f9886fcd48cb8aaf0ee09ef]
       [nodejs]
     [asset.0020cbb715d3c9a51e89e8b1dadef2577e906f060470930913470ae2cbc22284]
@@ -12786,7 +12619,6 @@
         - index.DoMNsXEy.css
     [asset.b0c7925b49ff443392e5fd2aba889e08d95ee251241b85203c55fcbebb785a9b]
       - index.js
-    [asset.7179ecf2d585777e47795ebd2b8d19e47c178537df75474990f31c580789380b-error]
     [asset.1a3f93a3842626bc33eed874297db00eebe28b2cea628201ed57c7907bb5c98a]
       - index.html
       - favicon.svg
@@ -12882,24 +12714,10 @@
         - client.BIGLHmRd.js
     [asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6]
       - index.js
-    [asset.ab2a690d44309391779640ef7bf68b26d85a75542edd16d2f20d2cccbc9e2899]
-      - index.html
-      - favicon.svg
-      [_astro]
-        - ChatWindow.DzZPWgP8.js
-        - index.CEThVCg_.js
-        - index.DidF7TE0.css
-        - client.pxMMZNkZ.js
-        - index.DoMNsXEy.css
-    [asset.bee7f62da600fae2f669a11957afec62bb504bc82202a7bbfecf0c524aa68429]
-      - index.js
     [asset.4f9edf5766b5ebab5b6b9de2ec58915da084dfa930072f41a8aee4066ece621c-error]
-    [asset.890eac4e126aa64ff7c3dc51e72e2605f6aea644e28e3e705023f32674703451-error]
     [asset.ab1467d19a2a5fc0c1d40f42d528e426c97136f804916fa5bb6aef7bb2f0c574]
       - index.js
     [asset.de0fe2cfb336dcf1a77af3f1842fe71d017da84013d3c7add26dbdfc36b34522]
-      - index.js
-    [asset.b32735bf638a7065ccede6857c3adbad475c9081e62bd13dff41afa3a0ff9372]
       - index.js
     [asset.8e7489c32e83ff01af0c817ea8b24cc16a8ec4c452a3a74d8f771ee15ad1e3e3]
       - index.html
@@ -12910,13 +12728,6 @@
         - index.DidF7TE0.css
         - client.pxMMZNkZ.js
         - index.D0f7QlNh.css
-    [asset.94c5df2817f8369e8a5e9bde0cc9720204d2baee5d9013e3e2688b960411e1df]
-      - index.js
-    [asset.045e0e1175babe990c064e6eb902165873bd226e84ae56341c56befe400451ca]
-      - index.js
-    [asset.e53365496f3db67d0dbf445c01ca93e9e5b955d9bfba7743a193091858816089-error]
-    [bundling-temp-645c95da8c832ca5e7edb837ff0cc1622ed6450234b3434f1e3b7d15ec9f0c51-error]
-    [asset.73f33a7bd1da7daa52e9fc463428ac2d086a0c48b777a796b25010e784e2e134-error]
     [asset.e61cf6b5c1f8f4ae1b334ab4e60df07ee420681e548c6bbcc6d4d8f84279fcef]
       - index.js
     [asset.e6224f4ce5b22e1e5aca74f9e24d66f4054ba53f0d036b9d2a2295ec0b53b8ba-error]
@@ -12959,11 +12770,8 @@
         - index.DhYZZe0J.js
         - ChatWindow.BS7SKt16.js
         - client.BIGLHmRd.js
-    [asset.e0a4a2f2bd056d28226c2247836d73a6129f3a61b07dfb9401be8ad2ce9314a2]
-      - index.js
     [asset.86d5415c6bd59e412a5ad27b36278f2207087aa438143c1311c67d9b124480f4]
       - index.js
-    [asset.56ddfc67b3b2f0b73d56c9798a446a4d0fd6c6c481b32dad6a299356d0bf2052-error]
     [asset.838df1e4dda82d8087b6dd35b46c17dafb73f38439e9f7fc13a78ad748d31073-error]
       [nodejs]
     [asset.0158f40002a8c211635388a87874fd4dcc3d68f525fe08a0fe0f014069ae539c]
@@ -14078,6 +13886,7 @@
         
         const logger = new Logger();
         
+        
         declare global {
           namespace awslambda {
             function streamifyResponse(
@@ -14162,54 +13971,11 @@
         mathAgent.setSystemPrompt(MATH_AGENT_PROMPT);
         
         const selfCheckInAgent = new BedrockLLMAgent({
-          name: "Self Check-in Agent",
-          description:
-            "Assists with onboarding (WiFi details, building info, check-in instructions, etc.).",
-          streaming: true,
-          inferenceConfig: {
-            temperature: 0.0,
-          },
-          customSystemPrompt:{
-            template:SELF_CHECKIN_AGENT_PROMPT
-          },
-          retriever: new AmazonKnowledgeBasesRetriever(
-            new BedrockAgentRuntimeClient(),
-            {
-              knowledgeBaseId: process.env.KNOWLEDGE_BASE_ID,
-              retrievalConfiguration: {
-                vectorSearchConfiguration: {
-                  numberOfResults: 1
-                },
-              },
-            }
-          )
-          });
-        
-        // const maoDocAgent = new BedrockLLMAgent({
-        //   name: "Tech agent",
-        //   description:
-        //     "Free agent that answer anything related to onboarding process, i.e. password on wifi",
-        //   streaming: true,
-        //   inferenceConfig: {
-        //     temperature: 0.0,
-        //   },
-        //   customSystemPrompt:{
-        //     template:'Free agent that answer anything related to onboarding process, i.e. password on wifi'
-        //   },
-        //   retriever: new AmazonKnowledgeBasesRetriever(
-        //     new BedrockAgentRuntimeClient(),
-        //     {
-        //       knowledgeBaseId: process.env.KNOWLEDGE_BASE_ID,
-        //       retrievalConfiguration: {
-        //         vectorSearchConfiguration: {
-        //           numberOfResults: 1
-        //           // overrideSearchType: SearchType.HYBRID,
-        //         },
-        //       },
-        //     }
-        //   )
-        //   });
-        // orchestrator.addAgent(maoDocAgent);
+          name: "Self-Check-In Agent",
+          description: "Assists with onboarding (WiFi details, building info, check-in instructions, etc.).",
+          streaming: false,
+        });
+        selfCheckInAgent.setSystemPrompt(SELF_CHECKIN_AGENT_PROMPT);
         
         const incidentReportingAgent = new BedrockLLMAgent({
           name: "Incident Reporting Agent",
@@ -14239,13 +14005,12 @@
         });
         smartIoTControlAgent.setSystemPrompt(SMART_IOT_CONTROL_AGENT_PROMPT);
         
+        orchestrator.addAgent(incidentReportingAgent);
         orchestrator.addAgent(selfCheckInAgent);
         orchestrator.addAgent(facilityBookingAgent);
         orchestrator.addAgent(visitorManagementAgent);
-        orchestrator.addAgent(incidentReportingAgent);
         orchestrator.addAgent(smartIoTControlAgent);
         orchestrator.addAgent(weatherAgent);
-        orchestrator.addAgent(mathAgent);
         
         const greetingAgent = new BedrockLLMAgent({
           name: "Greeting Agent",
@@ -14381,7 +14146,7 @@
         def lambda_handler(event, context):
             response = client.start_ingestion_job(
                 dataSourceId=event.get('dataSourceId'),
-                knowledgeBaseId="VQSZYFGTVF"
+                knowledgeBaseId=event.get('knowledgeBaseId')
             )
             print(response)
         [Code End]

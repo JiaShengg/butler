@@ -34,7 +34,7 @@ const actionGroupsList: AgentActionGroup[] = [
 // Define knowledge bases
 const knowledgeBases: KnowledgeBase[] = [
   {
-    knowledgeBaseId: "knowledge-base-id-01",
+    knowledgeBaseId: "VQSZYFGTVF",
     description: 'This is my knowledge base for documents 01',
   },
   {

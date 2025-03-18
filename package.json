@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "chroma": "^0.0.1",
+    "chromadb": "^1.10.4"
+  }
+}
